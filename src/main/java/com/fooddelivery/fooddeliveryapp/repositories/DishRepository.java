@@ -10,4 +10,5 @@ public interface DishRepository extends CrudRepository<Dish, Long> {
     List<Dish> findByNameContainingIgnoreCase(String filter);
 
     List<Dish> findAllByOrderByNameAsc();
+    Dish findByName(String name);
 }

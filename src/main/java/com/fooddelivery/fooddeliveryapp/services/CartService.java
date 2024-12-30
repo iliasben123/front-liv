@@ -6,7 +6,7 @@ import com.fooddelivery.fooddeliveryapp.entities.Dish;
 public interface CartService {
     Cart getCartForUser(Long userId);
 
-    Cart addDishToCart(Long userId, Long dishId);
+    Cart addDishToCart(Long userId, Long dishId , Integer quantity);
 
     Cart removeDishFromCart(Long userId, Long dishId);
 

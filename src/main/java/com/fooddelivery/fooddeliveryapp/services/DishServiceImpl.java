@@ -1,9 +1,13 @@
 package com.fooddelivery.fooddeliveryapp.services;
 
 import com.fooddelivery.fooddeliveryapp.entities.Dish;
+import com.fooddelivery.fooddeliveryapp.exceptions.DishNotFoundException;
 import com.fooddelivery.fooddeliveryapp.repositories.DishRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DishServiceImpl implements DishService {
@@ -14,26 +18,38 @@ public class DishServiceImpl implements DishService {
     public DishServiceImpl(DishRepository dishRepository) {
         this.dishRepository = dishRepository;
     }
-
+    CartDishService cartDishService = new CartDishService();
     @Override
     public Dish addDish(Dish dish) {
         return dishRepository.save(dish);
     }
 
-    @Override
-    public Dish updateDish(Long dishId, Dish dishDetails) {
-        Dish dish = dishRepository.findById(dishId).orElseThrow(() -> new IllegalArgumentException("Dish not found"));
-        dish.setName(dishDetails.getName());
-        dish.setPrice(dishDetails.getPrice());
-        dish.setDescription(dishDetails.getDescription());
-        return dishRepository.save(dish);
+    public Dish updateDish(String name, Dish dishDetails) {
+        Dish existingDish = dishRepository.findByName(name);
+        if (existingDish != null) {
+            existingDish.setName(dishDetails.getName());
+            existingDish.setDescription(dishDetails.getDescription());
+            existingDish.setPrice(dishDetails.getPrice());
+            existingDish.setCategory(dishDetails.getCategory());
+            existingDish.setRating(dishDetails.getRating());
+            existingDish.setImage(dishDetails.getImage());
+            existingDish.setQuantity(dishDetails.getQuantity());
+            return dishRepository.save(existingDish);
+        } else {
+            throw new IllegalArgumentException("Dish not found");
+        }
     }
 
-    @Override
-    public void deleteDish(Long dishId) {
-        Dish dish = dishRepository.findById(dishId).orElseThrow(() -> new IllegalArgumentException("Dish not found"));
-        dishRepository.delete(dish);
+    public void deleteDish(String name) {
+        Dish dish = dishRepository.findByName(name);
+        if (dish != null) {
+            dishRepository.delete(dish);
+        } else {
+            throw new IllegalArgumentException("Dish not found");
+        }
     }
+
+
 
     @Override
     public Iterable<Dish> getAllDishes(String filter, String sortBy , String category) {
@@ -48,4 +64,8 @@ public class DishServiceImpl implements DishService {
         }
         return dishRepository.findAll();
     }
+    public List<Dish> findByName(String name) {
+        return dishRepository.findByNameContainingIgnoreCase(name);
+    }
+
 }
